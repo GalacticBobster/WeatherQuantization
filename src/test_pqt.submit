@@ -4,10 +4,17 @@
 #PBS -N quant
 #PBS -A  
 #PBS -q main
+#PBS -j oe
 #PBS -l walltime=00:30:00
 
 module load conda
 conda activate e2s
 export EARTH2STUDIO_CACHE=/glade/derecho/scratch/ananyo/e2s_cache
-python -u test_int8.py
+export CARTOPY_DATA_DIR=/glade/derecho/scratch/ananyo/cartopy_data
+mkdir -p $CARTOPY_DATA_DIR
+
+#python -u 1.dlwp_pqt.py
+#python -u plot_dlwp.py
+python -u 3.fcn_exact.py
+#python -u 4.aifs_exact.py
 

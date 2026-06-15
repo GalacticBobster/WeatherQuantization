@@ -1,0 +1,105 @@
+The following modules were not unloaded:
+  (Use "module --force purge" to unload all):
+
+  1) ncarenv/25.10
+The following modules were not unloaded:
+  (Use "module --force purge" to unload all):
+=========================================
+
+Job: 4500960[0].casper-pbs   Index: 0
+  1) ncarenv/25.10Config: FP32
+
+Node: casper31
+GPU: Tesla V100-SXM2-32GB
+Start: Thu Jun 11 04:34:42 PM MDT 2026
+=========================================
+The following modules were not unloaded:
+  (Use "module --force purge" to unload all):
+
+  1) ncarenv/25.10
+=========================================
+Job: 4500960[1].casper-pbs   Index: 1
+Config: INT8
+Node: casper24
+GPU: Tesla V100-SXM2-32GB
+Start: Thu Jun 11 04:34:42 PM MDT 2026
+=========================================
+/glade/work/ananyo/conda-envs/e2s/lib/python3.12/site-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+=========================================
+Job: 4500960[2].casper-pbs   Index: 2
+Config: FP8
+Node: casper24
+GPU: Tesla V100-SXM2-32GB
+Start: Thu Jun 11 04:34:43 PM MDT 2026
+=========================================
+/glade/work/ananyo/conda-envs/e2s/lib/python3.12/site-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/glade/work/ananyo/conda-envs/e2s/lib/python3.12/site-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+CuPy distance computation test failed with error: cuVS >= 24.12 or pylibraft < 24.12 should be installed to use this feature
+CuPy distance computation test failed with error: cuVS >= 24.12 or pylibraft < 24.12 should be installed to use this feature
+CuPy distance computation test failed with error: cuVS >= 24.12 or pylibraft < 24.12 should be installed to use this feature
+Quantizing Pangu ONNX to INT8 …
+Calib samples: 4
+Quantizing Pangu ONNX to FP8 …
+Calib samples: 4
+Loaded FP32 Pangu6 model
+2026-06-11 16:35:30,718 - [modelopt][onnx] - INFO - Starting quantization process for model: /glade/derecho/scratch/ananyo/e2s_cache/pangu/pangu_weather_6.onnx
+2026-06-11 16:35:30,722 - [modelopt][onnx] - INFO - Quantization mode: int8
+2026-06-11 16:35:30,722 - [modelopt][onnx] - INFO - Preprocessing the model /glade/derecho/scratch/ananyo/e2s_cache/pangu/pangu_weather_6.onnx
+2026-06-11 16:35:32,433 - [modelopt][onnx] - INFO - Starting quantization process for model: /glade/derecho/scratch/ananyo/e2s_cache/pangu/pangu_weather_6.onnx
+2026-06-11 16:35:32,433 - [modelopt][onnx] - INFO - Quantization mode: fp8
+2026-06-11 16:35:32,433 - [modelopt][onnx] - INFO - Preprocessing the model /glade/derecho/scratch/ananyo/e2s_cache/pangu/pangu_weather_6.onnx
+Benchmarking inference time …
+[32m2026-06-11 16:35:34.085[0m | [1mINFO    [0m | [36mearth2studio.run[0m:[36mdeterministic[0m:[36m78[0m - [1mRunning simple workflow![0m
+[32m2026-06-11 16:35:34.085[0m | [1mINFO    [0m | [36mearth2studio.run[0m:[36mdeterministic[0m:[36m85[0m - [1mInference device: cuda[0m
+Traceback (most recent call last):
+  File "/glade/derecho/scratch/ananyo/WeatherQuantization/src/7.pangu_bench.py", line 126, in <module>
+    infer_ms  = benchmark_time(model)
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "/glade/derecho/scratch/ananyo/WeatherQuantization/src/7.pangu_bench.py", line 122, in benchmark_time
+    run.deterministic([init], NSTEPS, m, era5, io)
+  File "/glade/work/ananyo/conda-envs/e2s/lib/python3.12/site-packages/earth2studio/run.py", line 86, in deterministic
+    prognostic = prognostic.to(device)
+                 ^^^^^^^^^^^^^^^^^^^^^
+  File "/glade/work/ananyo/conda-envs/e2s/lib/python3.12/site-packages/earth2studio/models/px/pangu.py", line 232, in to
+    model_path = self.ort._model_path
+                 ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute '_model_path'
+End: Thu Jun 11 04:35:36 PM MDT 2026
+Done: FP32
+Traceback (most recent call last):
+  File "/glade/derecho/scratch/ananyo/WeatherQuantization/src/7.pangu_bench.py", line 81, in <module>
+    mto.quantize(
+  File "/glade/work/ananyo/conda-envs/e2s/lib/python3.12/site-packages/modelopt/onnx/quantization/quantize.py", line 582, in quantize
+    ) = _preprocess_onnx(
+        ^^^^^^^^^^^^^^^^^
+  File "/glade/work/ananyo/conda-envs/e2s/lib/python3.12/site-packages/modelopt/onnx/quantization/quantize.py", line 114, in _preprocess_onnx
+    onnx_model, has_custom_op, custom_ops, onnx_path, use_external_data_format = load_onnx_model(
+                                                                                 ^^^^^^^^^^^^^^^^
+  File "/glade/work/ananyo/conda-envs/e2s/lib/python3.12/site-packages/modelopt/onnx/trt_utils.py", line 321, in load_onnx_model
+    onnx.shape_inference.infer_shapes_path(onnx_path)
+  File "/glade/work/ananyo/conda-envs/e2s/lib/python3.12/site-packages/onnx/shape_inference.py", line 108, in infer_shapes_path
+    C.infer_shapes_path(model_path, output_path, check_type, strict_mode, data_prop)
+onnx.onnx_cpp2py_export.checker.ValidationError: Unable to parse proto from file: /glade/derecho/scratch/ananyo/e2s_cache/pangu/pangu_weather_6.onnx. Please check if it is a valid protobuf file of proto. 
+End: Thu Jun 11 04:35:49 PM MDT 2026
+Done: FP8
+2026-06-11 16:35:56,004 - [modelopt][onnx] - INFO - No custom ops found. If that's not correct, please make sure that the 'tensorrt' python package is correctly installed and that the paths to 'libcudnn*.so' and TensorRT 'lib/' are in 'LD_LIBRARY_PATH'. If the custom op is not directly available as a plugin in TensorRT, please also make sure that the path to the compiled '.so' TensorRT plugin is also being given via the  '--trt_plugins' flag (requires TRT 10+).
+2026-06-11 16:36:10,746 - [modelopt][onnx] - INFO - Model is cloned to /glade/derecho/scratch/ananyo/WeatherQuantization/outputs/pangu_bench/INT8/pangu_weather_6_opset19.onnx with opset_version 19
+2026-06-11 16:36:10,974 - [modelopt][onnx] - INFO - Duplicating shared constants
+2026-06-11 16:36:18,387 - [modelopt][onnx] - INFO - Model is cloned to /glade/derecho/scratch/ananyo/WeatherQuantization/outputs/pangu_bench/INT8/pangu_weather_6_named.onnx after naming the nodes
+2026-06-11 16:36:18,388 - [modelopt][onnx] - INFO - Setting up CalibrationDataProvider for calibration
+Traceback (most recent call last):
+  File "/glade/derecho/scratch/ananyo/WeatherQuantization/src/7.pangu_bench.py", line 81, in <module>
+    mto.quantize(
+  File "/glade/work/ananyo/conda-envs/e2s/lib/python3.12/site-packages/modelopt/onnx/quantization/quantize.py", line 601, in quantize
+    calibration_data_reader = CalibrationDataProvider(
+                              ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/glade/work/ananyo/conda-envs/e2s/lib/python3.12/site-packages/modelopt/onnx/quantization/calib_utils.py", line 95, in __init__
+    np.array_split(calibration_data[input_name], n_itr, axis=0)
+  File "/glade/work/ananyo/conda-envs/e2s/lib/python3.12/site-packages/numpy/lib/_shape_base_impl.py", line 789, in array_split
+    raise ValueError('number sections must be larger than 0.') from None
+ValueError: number sections must be larger than 0.
+End: Thu Jun 11 04:36:21 PM MDT 2026
+Done: INT8

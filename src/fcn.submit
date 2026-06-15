@@ -1,0 +1,43 @@
+#PBS -o out
+#PBS -e err
+#PBS -l select=1:ncpus=2:mem=128GB:ngpus=1:gpu_type=v100_8way
+#PBS -N quant
+#PBS -A  
+#PBS -q main
+#PBS -j oe
+#PBS -J 0-6
+#PBS -l walltime=01:00:00
+
+CONFIGS=("FP32" "W8A8" "W8A32" "W4A32" "W2A32" "INT8_SMOOTHQUANT" "INT4_AWQ")
+CONFIG=${CONFIGS[$PBS_ARRAY_INDEX]}
+OUTDIR=/glade/derecho/scratch/ananyo/WeatherQuantization/outputs/fcn_bench/${CONFIG}
+ 
+mkdir -p $OUTDIR
+mkdir -p /glade/derecho/scratch/ananyo/WeatherQuantization/logs
+ 
+module purge
+module load gcc cuda
+module load conda
+conda activate e2s
+
+export CC=gcc
+export CXX=g++
+export TORCH_EXTENSIONS_DIR=/glade/derecho/scratch/ananyo/.torch_extensions 
+export EARTH2STUDIO_CACHE=/glade/derecho/scratch/ananyo/e2s_cache
+export PIP_CACHE_DIR=/glade/derecho/scratch/ananyo/.pip_cache
+export TMPDIR=/glade/derecho/scratch/ananyo/tmp
+ 
+echo "========================================="
+echo "Job: $PBS_JOBID   Index: $PBS_ARRAY_INDEX"
+echo "Config: $CONFIG"
+echo "Node: $(hostname)"
+echo "GPU: $(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null || echo none)"
+echo "Start: $(date)"
+echo "========================================="
+ 
+cd /glade/derecho/scratch/ananyo/WeatherQuantization/src
+python -u 6.fcn_bench.py --config $CONFIG --outdir $OUTDIR
+ 
+echo "End: $(date)"
+echo "Done: $CONFIG"
+
