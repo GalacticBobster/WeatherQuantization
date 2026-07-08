@@ -1,39 +1,51 @@
-#PBS -o out
-#PBS -e err
-#PBS -l select=1:ncpus=2:mem=128GB:ngpus=1:gpu_type=v100_8way
-#PBS -N quant
-#PBS -A  
-#PBS -q main
-#PBS -l walltime=00:30:00
-#PBS -J 0-6
+#!/bin/bash
+#PBS -o out_dlwp
+#PBS -e err_dlwp
+#PBS -l select=1:ncpus=2:mem=64GB:ngpus=1:gpu_type=v100
+#PBS -N dlwp_quant
+#PBS -A 
+#PBS -q casper
 #PBS -j oe
- 
+#PBS -J 0-6
+#PBS -l walltime=00:30:00
+
+# ── config selection ─────────────────────────────────────────
 CONFIGS=("FP32" "W8A8" "W8A32" "W4A32" "W2A32" "INT8_SMOOTHQUANT" "INT4_AWQ")
 CONFIG=${CONFIGS[$PBS_ARRAY_INDEX]}
-OUTDIR=/glade/derecho/scratch/ananyo/WeatherQuantization/outputs/dlwp_bench/${CONFIG}
- 
+
+# ── GPU tag detected from queue/gpu_type ─────────────────────
+GPU_TAG=V100   # change to A100 or H100 if you edit gpu_type above
+
+OUTDIR=/glade/derecho/scratch/ananyo/WeatherQuantization/outputs_${GPU_TAG}/dlwp_bench/${CONFIG}
 mkdir -p $OUTDIR
 mkdir -p /glade/derecho/scratch/ananyo/WeatherQuantization/logs
- 
-source /etc/profile.d/conda.sh
+
+# ── environment ──────────────────────────────────────────────
+module purge
+module load gcc cuda
 module load conda
 conda activate e2s
- 
+
+export CC=gcc CXX=g++
+export CUDA_VISIBLE_DEVICES=0
+export TORCH_EXTENSIONS_DIR=/glade/derecho/scratch/ananyo/.torch_extensions
 export EARTH2STUDIO_CACHE=/glade/derecho/scratch/ananyo/e2s_cache
 export PIP_CACHE_DIR=/glade/derecho/scratch/ananyo/.pip_cache
 export TMPDIR=/glade/derecho/scratch/ananyo/tmp
- 
+
+# ── diagnostics ──────────────────────────────────────────────
 echo "========================================="
-echo "Job: $PBS_JOBID   Index: $PBS_ARRAY_INDEX"
+echo "Job:    $PBS_JOBID   Index: $PBS_ARRAY_INDEX"
 echo "Config: $CONFIG"
-echo "Node: $(hostname)"
-echo "GPU: $(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null || echo none)"
-echo "Start: $(date)"
+echo "Node:   $(hostname)"
+echo "GPU:    $(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null || echo none)"
+echo "Torch:  $(python -c 'import torch; print(torch.__version__, "CUDA:", torch.cuda.is_available())')"
+echo "Start:  $(date)"
 echo "========================================="
- 
+
+# ── run ──────────────────────────────────────────────────────
 cd /glade/derecho/scratch/ananyo/WeatherQuantization/src
-python -u 5.dlwp_bench.py --config $CONFIG --outdir $OUTDIR
- 
+python -u 1.dlwp.py --config $CONFIG --outdir $OUTDIR
+
 echo "End: $(date)"
 echo "Done: $CONFIG"
-
