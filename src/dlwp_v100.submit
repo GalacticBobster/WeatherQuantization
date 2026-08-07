@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -o out_dlwp
 #PBS -e err_dlwp
-#PBS -l select=1:ncpus=2:mem=64GB:ngpus=1:gpu_type=a100
+#PBS -l select=1:ncpus=2:mem=64GB:ngpus=1:gpu_type=v100
 #PBS -N dlwp_quant
 #PBS -A 
 #PBS -l place=excl
@@ -15,7 +15,7 @@ CONFIGS=("FP32" "W8A8" "W8A32" "W4A32" "W2A32" "INT8_SMOOTHQUANT" "INT4_AWQ")
 CONFIG=${CONFIGS[$PBS_ARRAY_INDEX]}
 
 # ── GPU tag detected from queue/gpu_type ─────────────────────
-GPU_TAG=A100   # change to A100 or H100 if you edit gpu_type above
+GPU_TAG=V100   # change to A100 or H100 if you edit gpu_type above
 
 OUTDIR=/glade/derecho/scratch/ananyo/WeatherQuantization/outputs_${GPU_TAG}/dlwp_bench/${CONFIG}
 mkdir -p $OUTDIR

@@ -1,10 +1,11 @@
 #!/bin/bash
 #PBS -o out_fcn
 #PBS -e err_fcn
-#PBS -l select=1:ncpus=2:mem=128GB:ngpus=1:gpu_type=v100
+#PBS -l select=1:ncpus=2:mem=128GB:ngpus=1:gpu_type=a100
 #PBS -N fcn_quant
-#PBS -A 
+#PBS -A  
 #PBS -q casper
+#PBS -l place=excl
 #PBS -j oe
 #PBS -J 0-6
 #PBS -l walltime=00:30:00
@@ -14,7 +15,7 @@ CONFIGS=("FP32" "W8A8" "W8A32" "W4A32" "W2A32" "INT8_SMOOTHQUANT" "INT4_AWQ")
 CONFIG=${CONFIGS[$PBS_ARRAY_INDEX]}
 
 # ── GPU tag ──────────────────────────────────────────────────
-GPU_TAG=V100   # change to A100 or H100 if you edit gpu_type above
+GPU_TAG=A100   # change to A100 or H100 if you edit gpu_type above
 
 OUTDIR=/glade/derecho/scratch/ananyo/WeatherQuantization/outputs_${GPU_TAG}/fcn_bench/${CONFIG}
 mkdir -p $OUTDIR
@@ -29,10 +30,19 @@ conda activate e2s
 export CC=gcc CXX=g++
 export CUDA_VISIBLE_DEVICES=0
 export TORCH_EXTENSIONS_DIR=/glade/derecho/scratch/ananyo/.torch_extensions
-export EARTH2STUDIO_CACHE=/glade/derecho/scratch/ananyo/e2s_cache
+export EARTH2STUDIO_CACHE=/glade/derecho/scratch/ananyo/e2s_cache_task_${PBS_ARRAY_INDEX}
+mkdir -p $EARTH2STUDIO_CACHE
+export HDF5_USE_FILE_LOCKING=FALSE
 export PIP_CACHE_DIR=/glade/derecho/scratch/ananyo/.pip_cache
 export TMPDIR=/glade/derecho/scratch/ananyo/tmp
 
+
+SHARED=/glade/derecho/scratch/ananyo/e2s_cache
+for d in dlwp fcn arco wb2; do
+  if [ -d "$SHARED/$d" ]; then
+    cp -r $SHARED/$d $EARTH2STUDIO_CACHE/
+  fi
+done
 # ── diagnostics ──────────────────────────────────────────────
 echo "========================================="
 echo "Job:    $PBS_JOBID   Index: $PBS_ARRAY_INDEX"
@@ -45,7 +55,7 @@ echo "========================================="
 
 # ── run ──────────────────────────────────────────────────────
 cd /glade/derecho/scratch/ananyo/WeatherQuantization/src
-python -u 2.fcn.py --config $CONFIG --outdir $OUTDIR
+python -u fcn.py --config $CONFIG --outdir $OUTDIR
 
 echo "End: $(date)"
 echo "Done: $CONFIG"

@@ -1,6 +1,7 @@
 """
 FCN PTQ benchmark: skill (RMSE + ACC) and hardware metrics across configs.
-Uses GFS for initial conditions, WB2 ERA5 climatology for ACC anomaly reference.
+Uses ARCO ERA5 (via ArcoFCN wrapper) for initial conditions AND truth.
+WB2 ERA5 climatology for ACC anomaly reference.
 Analytical FLOPs from architecture specs.
 """
 import matplotlib
@@ -10,20 +11,25 @@ from datetime import datetime, timedelta
 import numpy as np
 import matplotlib.pyplot as plt
 import torch, zarr
-from earth2studio.data import GFS, WB2Climatology
+from earth2studio.data import WB2Climatology
 from earth2studio.models.px.fcn import FCN
 from earth2studio.io import ZarrBackend
 import earth2studio.run as run
 import modelopt.torch.quantization as mtq
 
+from arco_for_fcn import ArcoFCN   # our ARCO ERA5 → FCN 26-channel wrapper
+
 # ═══════════════════════════════════════════════════════════════
-VARIABLES   = ["z500", "z300", "z700", "z1000", "t850", "t2m", "tcwv"]
-EVAL_DATES  = ["2022-01-01", "2022-04-01", "2022-07-01", "2022-10-01"]
+# in the VARIABLES list — remove "u10", "v10" since output is now called u10m
+VARIABLES = ["z500", "z300", "z700", "z1000", "t850", "t2m", "tcwv",
+             "u10m", "v10m",         # matches FCN output names
+             "u500", "v500", "u850", "v850"]
+EVAL_DATES  = ["2020-01-01", "2020-04-01", "2020-07-01", "2020-10-01"]
 NSTEPS      = 10
 CALIB_STEPS = 8
 MODEL_NAME  = "FCN"
 
-FLOPS = {"params_M": 300.0, "flops_step_G": 620.0, "flops_forecast_G": 6200.0}
+FLOPS = {"params_M": 74.0, "flops_step_G": 2400.0, "flops_forecast_G": 24000.0}
 # ═══════════════════════════════════════════════════════════════
 
 def make_cfg(wb=8, ab=None):
@@ -60,7 +66,7 @@ os.makedirs(args.outdir, exist_ok=True)
 
 slug    = f"fcn_{args.config}"
 device  = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-gfs     = GFS()
+era5    = ArcoFCN()                # replaces the old GFS() data source
 clim    = WB2Climatology()
 package = FCN.load_default_package()
 avail   = lambda io: list(zarr.open(io.store, mode="r").keys())
@@ -87,7 +93,7 @@ def benchmark_time(m, n_runs=5):
     t0 = time.perf_counter()
     for _ in range(n_runs):
         io = ZarrBackend()
-        with torch.no_grad(): run.deterministic([init], NSTEPS, m, gfs, io)
+        with torch.no_grad(): run.deterministic([init], NSTEPS, m, era5, io)
     if torch.cuda.is_available(): torch.cuda.synchronize()
     return 1000*(time.perf_counter()-t0)/n_runs
 
@@ -95,7 +101,7 @@ def benchmark_time(m, n_runs=5):
 _probe = FCN.load_model(package).to(device).eval()
 _io    = ZarrBackend()
 with torch.no_grad():
-    _io = run.deterministic([datetime.fromisoformat(EVAL_DATES[0])], 1, _probe, gfs, _io)
+    _io = run.deterministic([datetime.fromisoformat(EVAL_DATES[0])], 1, _probe, era5, _io)
 coord_keys = {"lat","lon","lead_time","time","batch","ensemble"}
 MODEL_VARS = [v for v in VARIABLES if v in avail(_io) and v not in coord_keys]
 w_lat      = np.cos(np.deg2rad(_io["lat"][:])); w_lat = (w_lat/w_lat.mean())[np.newaxis,:,np.newaxis]
@@ -120,6 +126,7 @@ def get_climatology(date_str):
             da = clim(time=vt, variable=MODEL_VARS)
             for v in MODEL_VARS:
                 field = np.squeeze(da.sel(variable=v).values)
+                # trim 721→720 lats if needed (climatology has south pole, FCN doesn't)
                 if field.shape[0] == 721 and w_lat.shape[1] == 720:
                     field = field[:720]
                 out[v].append(field)
@@ -139,7 +146,7 @@ with torch.inference_mode(False):
         def fwd(inner):
             model.model = inner
             with torch.inference_mode(False):
-                run.deterministic([calib_init], CALIB_STEPS, model, gfs, ZarrBackend())
+                run.deterministic([calib_init], CALIB_STEPS, model, era5, ZarrBackend())
         print(f"Calibrating {args.config} …")
         model.model = mtq.quantize(model.model, CONFIGS[args.config], fwd)
 
@@ -191,7 +198,7 @@ print(f"Hardware CSV → {csv_path}")
 def run_fcast(m, date_str):
     io = ZarrBackend()
     with torch.no_grad():
-        io = run.deterministic([datetime.fromisoformat(date_str)], NSTEPS, m, gfs, io)
+        io = run.deterministic([datetime.fromisoformat(date_str)], NSTEPS, m, era5, io)
     leads = io["lead_time"][:].astype("timedelta64[ns]").astype("timedelta64[h]").astype(int)
     return {v: io[v][0] for v in MODEL_VARS if v in avail(io)}, leads
 
@@ -200,7 +207,7 @@ def get_truth(date_str):
     for s in range(NSTEPS + 1):
         io = ZarrBackend()
         with torch.no_grad():
-            io = run.deterministic([init + timedelta(hours=s*6)], 0, probe_model, gfs, io)
+            io = run.deterministic([init + timedelta(hours=s*6)], 0, probe_model, era5, io)
         for v in MODEL_VARS:
             if v in avail(io): out[v].append(io[v][0, 0])
     return {v: np.stack(out[v], 0) for v in MODEL_VARS if out[v]}
@@ -272,7 +279,7 @@ def plot_panel(data_q, data_ref, ylabel, tag, hline=None, ylim=None):
     fig.savefig(os.path.join(args.outdir, f"{slug}_{tag}.png"), dpi=150); plt.close(fig)
     print(f"Saved {tag}.png")
 
-try: plot_panel(re, r32, "Lat-wtd RMSE vs GFS",  "rmse_vs_gfs")
+try: plot_panel(re, r32, "Lat-wtd RMSE vs ERA5", "rmse_vs_era5")
 except Exception as e: print(f"RMSE plot failed: {e}")
 try: plot_panel(rf, None, "Lat-wtd RMSE vs FP32", "rmse_vs_fp32")
 except Exception as e: print(f"RMSE-FP32 plot failed: {e}")

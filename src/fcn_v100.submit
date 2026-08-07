@@ -1,8 +1,8 @@
 #!/bin/bash
-#PBS -o out_dlwp
-#PBS -e err_dlwp
-#PBS -l select=1:ncpus=2:mem=64GB:ngpus=1:gpu_type=a100
-#PBS -N dlwp_quant
+#PBS -o out_fcn
+#PBS -e err_fcn
+#PBS -l select=1:ncpus=2:mem=128GB:ngpus=1:gpu_type=v100
+#PBS -N fcn_quant
 #PBS -A 
 #PBS -l place=excl
 #PBS -q casper
@@ -14,10 +14,10 @@
 CONFIGS=("FP32" "W8A8" "W8A32" "W4A32" "W2A32" "INT8_SMOOTHQUANT" "INT4_AWQ")
 CONFIG=${CONFIGS[$PBS_ARRAY_INDEX]}
 
-# ── GPU tag detected from queue/gpu_type ─────────────────────
-GPU_TAG=A100   # change to A100 or H100 if you edit gpu_type above
+# ── GPU tag ──────────────────────────────────────────────────
+GPU_TAG=V100   # change to A100 or H100 if you edit gpu_type above
 
-OUTDIR=/glade/derecho/scratch/ananyo/WeatherQuantization/outputs_${GPU_TAG}/dlwp_bench/${CONFIG}
+OUTDIR=/glade/derecho/scratch/ananyo/WeatherQuantization/outputs_${GPU_TAG}/fcn_bench/${CONFIG}
 mkdir -p $OUTDIR
 mkdir -p /glade/derecho/scratch/ananyo/WeatherQuantization/logs
 
@@ -30,9 +30,9 @@ conda activate e2s
 export CC=gcc CXX=g++
 export CUDA_VISIBLE_DEVICES=0
 export TORCH_EXTENSIONS_DIR=/glade/derecho/scratch/ananyo/.torch_extensions
-export HDF5_USE_FILE_LOCKING=FALSE
 export EARTH2STUDIO_CACHE=/glade/derecho/scratch/ananyo/e2s_cache_task_${PBS_ARRAY_INDEX}
 mkdir -p $EARTH2STUDIO_CACHE
+export HDF5_USE_FILE_LOCKING=FALSE
 export PIP_CACHE_DIR=/glade/derecho/scratch/ananyo/.pip_cache
 export TMPDIR=/glade/derecho/scratch/ananyo/tmp
 
@@ -55,7 +55,7 @@ echo "========================================="
 
 # ── run ──────────────────────────────────────────────────────
 cd /glade/derecho/scratch/ananyo/WeatherQuantization/src
-python -u dlwp.py --config $CONFIG --outdir $OUTDIR
+python -u fcn.py --config $CONFIG --outdir $OUTDIR
 
 echo "End: $(date)"
 echo "Done: $CONFIG"

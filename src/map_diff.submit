@@ -1,0 +1,44 @@
+#!/bin/bash
+#PBS -o out_maps_diff
+#PBS -e err_maps_diff
+#PBS -l select=1:ncpus=2:mem=128GB:ngpus=1:gpu_type=v100
+#PBS -N maps_diff
+#PBS -A 
+#PBS -q casper
+#PBS -j oe
+#PBS -l walltime=00:45:00
+
+# ── environment ──────────────────────────────────────────────
+module purge
+module load gcc cuda
+module load conda
+conda activate e2s
+
+export CC=gcc CXX=g++
+export CUDA_VISIBLE_DEVICES=0
+export TORCH_EXTENSIONS_DIR=/glade/derecho/scratch/ananyo/.torch_extensions
+export EARTH2STUDIO_CACHE=/glade/derecho/scratch/ananyo/e2s_cache
+export HDF5_USE_FILE_LOCKING=FALSE
+export PIP_CACHE_DIR=/glade/derecho/scratch/ananyo/.pip_cache
+export TMPDIR=/glade/derecho/scratch/ananyo/tmp
+
+# ── diagnostics ──────────────────────────────────────────────
+echo "========================================="
+echo "Job:   $PBS_JOBID"
+echo "Node:  $(hostname)"
+echo "GPU:   $(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null || echo none)"
+echo "Torch: $(python -c 'import torch; print(torch.__version__, "CUDA:", torch.cuda.is_available())')"
+echo "Start: $(date)"
+echo "========================================="
+
+# ── run both models sequentially ─────────────────────────────
+cd /glade/derecho/scratch/ananyo/WeatherQuantization/src
+
+echo -e "\n--- DLWP diff maps ---"
+python -u map_diff.py dlwp
+
+echo -e "\n--- FCN diff maps ---"
+python -u map_diff.py fcn
+
+echo "End: $(date)"
+echo "Done."
