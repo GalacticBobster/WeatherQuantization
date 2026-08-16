@@ -104,8 +104,8 @@ CONFIG_ORDER = ["FP32", "W8A8", "W8A32", "W4A32", "W2A32",
 METRICS = [
     # ("theoretical_size_mb_mean",     "Model size (MB)",         "Memory"),
     ("inference_ms_per_forecast_mean", "Inference (ms/forecast)", "Inference time"),
-    ("mean_power_w_mean",              "GPU power (W)",           "Power draw"),
-    ("energy_j_per_forecast_mean",     "Energy (J/forecast)",     "Energy per forecast"),
+   # ("mean_power_w_mean",              "GPU power (W)",           "Power draw"),
+  #  ("energy_j_per_forecast_mean",     "Energy (J/forecast)",     "Energy per forecast"),
 ]
 
 for model in agg["model"].unique():
@@ -144,12 +144,12 @@ for model in agg["model"].unique():
             ax.bar(x + offset, vals, width, yerr=errs, label=gpu, capsize=3)
 
         # idle baseline is a useful reference on the power panel
-        if col == "mean_power_w_mean" and "idle_power_w_mean" in sub.columns:
-            idle = sub["idle_power_w_mean"].mean()
-            if not pd.isna(idle):
-                ax.axhline(idle, color="gray", ls=":", lw=1.2,
-                           label=f"idle ≈ {idle:.0f} W")
-                ax.legend(fontsize=12)
+        #if col == "mean_power_w_mean" and "idle_power_w_mean" in sub.columns:
+           # idle = sub["idle_power_w_mean"].mean()
+           # if not pd.isna(idle):
+           #     ax.axhline(idle, color="gray", ls=":", lw=1.2,
+           #                label=f"idle ≈ {idle:.0f} W")
+           #     ax.legend(fontsize=12)
 
         ax.set_xticks(x + width * (len(gpus) - 1) / 2)
         ax.set_xticklabels(configs, rotation=30, ha="right", fontsize=14)
@@ -159,6 +159,6 @@ for model in agg["model"].unique():
         ax.legend(fontsize=12)
         ax.grid(True, alpha=0.3, axis="y")
 
-    out = os.path.join(OUTDIR, f"hardware_{model.lower()}_bars.png")
+    out = os.path.join(OUTDIR, f"inference_hardware_{model.lower()}_bars.png")
     fig.savefig(out, dpi=150, bbox_inches="tight"); plt.close()
     print(f"Plot     → {out}")

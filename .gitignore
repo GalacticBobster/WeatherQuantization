@@ -1,1 +1,5 @@
-outputs/
+outputs_combined/
+outputs_A100/
+outputs_V100/
+logs/
+junk/

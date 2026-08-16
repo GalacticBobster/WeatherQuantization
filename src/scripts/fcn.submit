@@ -3,7 +3,7 @@
 #PBS -e err_fcn
 #PBS -l select=1:ncpus=2:mem=128GB:ngpus=1:gpu_type=a100
 #PBS -N fcn_quant
-#PBS -A  
+#PBS -A   
 #PBS -q casper
 #PBS -l place=excl
 #PBS -j oe

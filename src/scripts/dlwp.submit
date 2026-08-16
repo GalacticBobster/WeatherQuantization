@@ -3,7 +3,7 @@
 #PBS -e err_dlwp
 #PBS -l select=1:ncpus=2:mem=64GB:ngpus=1:gpu_type=a100
 #PBS -N dlwp_quant
-#PBS -A 
+#PBS -A  
 #PBS -l place=excl
 #PBS -q casper
 #PBS -j oe
