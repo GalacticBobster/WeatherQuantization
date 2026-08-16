@@ -1,5 +1,5 @@
 # WeatherQuantization
-A systematic study of numerical precision effects on AI weather model inference. We characterize forecast skill degradation across a complete precision ladder using Post Training Quantization (PTQ). We use NVIDIA Earth2Studio and ModelOptimizer to implement PTQ in two different AI emulators: 
+A systematic study of numerical precision effects on AI weather model inference. We characterize forecast skill degradation across a complete precision ladder using Post Training Quantization (PTQ). We use [NVIDIA Earth2Studio](https://nvidia.github.io/earth2studio/main/) and [ModelOptimizer](https://nvidia.github.io/Model-Optimizer/) to implement PTQ in two different AI emulators: 
 
 - Deep Learning Weather Prediction (DLWP)
 - FourCastNet (FCN)
