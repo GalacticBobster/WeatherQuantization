@@ -56,3 +56,30 @@ If you use WeatherQuantization in your research, please cite:
 ```
 
 ## References
+```bibtex
+@misc{nvidia-modelopt,
+  author       = {{NVIDIA Corporation}},
+  title        = {{NVIDIA Model Optimizer}},
+  howpublished = {\url{https://github.com/NVIDIA/Model-Optimizer}},
+  year         = {2024--2026},
+  note         = {GitHub repository}
+}
+
+@article{weyn2021sub,
+  title={Sub-seasonal forecasting with a large ensemble of deep-learning weather prediction models},
+  author={Weyn, Jonathan A and Durran, Dale R and Caruana, Rich and Cresswell-Clay, Nathaniel},
+  journal={Journal of Advances in Modeling Earth Systems},
+  volume={13},
+  number={7},
+  pages={e2021MS002502},
+  year={2021},
+  publisher={Wiley Online Library}
+}
+
+@article{pathak2022fourcastnet,
+  title={Fourcastnet: A global data-driven high-resolution weather model using adaptive fourier neural operators},
+  author={Pathak, Jaideep and Subramanian, Shashank and Harrington, Peter and Raja, Sanjeev and Chattopadhyay, Ashesh and Mardani, Morteza and Kurth, Thorsten and Hall, David and Li, Zongyi and Azizzadenesheli, Kamyar and others},
+  journal={arXiv preprint arXiv:2202.11214},
+  year={2022}
+}
+```
