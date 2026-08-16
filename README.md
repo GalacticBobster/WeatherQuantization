@@ -34,7 +34,7 @@ The following figure shows the evolution of forecast skill in DLWP model as nume
 
 ### Spatial map of 2m air temperature
 
-
+![Air temperature map at the end of 60 hour forecast](outputs/fcn_t2m_maps.png)
 
 ## Citation 
 
