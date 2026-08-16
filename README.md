@@ -38,4 +38,21 @@ The following figure shows the evolution of forecast skill in DLWP model as nume
 
 ## Citation 
 
+If you use WeatherQuantization in your research, please cite:
+
+```bibtex
+@software{ananyo_bhattacharya_2026_21969498,
+  author       = {Ananyo Bhattacharya and
+                  Bhattacharya, Swastik Bimal},
+  title        = {GalacticBobster/WeatherQuantization:
+                  WeatherQuantv1.0},
+  month        = aug,
+  year         = 2026,
+  publisher    = {Zenodo},
+  version      = {v1.0},
+  doi          = {10.5281/zenodo.21969498},
+  url          = {https://doi.org/10.5281/zenodo.21969498},
+}
+```
+
 ## References
