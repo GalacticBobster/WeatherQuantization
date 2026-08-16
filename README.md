@@ -82,4 +82,15 @@ If you use WeatherQuantization in your research, please cite:
   journal={arXiv preprint arXiv:2202.11214},
   year={2022}
 }
+
+@article{rasp2024weatherbench,
+  title={Weatherbench 2: A benchmark for the next generation of data-driven global weather models},
+  author={Rasp, Stephan and Hoyer, Stephan and Merose, Alexander and Langmore, Ian and Battaglia, Peter and Russell, Tyler and Sanchez-Gonzalez, Alvaro and Yang, Vivian and Carver, Rob and Agrawal, Shreya and others},
+  journal={Journal of Advances in Modeling Earth Systems},
+  volume={16},
+  number={6},
+  pages={e2023MS004019},
+  year={2024},
+  publisher={Wiley Online Library}
+}
 ```
