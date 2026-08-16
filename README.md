@@ -24,6 +24,18 @@ WeatherQuantization/
 
 The src directory contains the python codes to implement PTQ and run test for power consumption, inference time and memory footprint for each configuration. The subfolder scripts contains PBS scripts to run inferences on GPU. They have been written for NSF NCAR Casper HPC. outputs folder contains the root mean square error (RMSE) and anomaly correlation coefficient (ACC) for each PTQ experiment. We trace the evolution of forecast skill scores over a short-term forecast horizon.
 
+## Results
+
+### Forecast Skill Across the Precision Ladder
+
+The following figure shows the evolution of forecast skill in DLWP model as numerical precision is reduced.
+
+![Forecast skill across precision levels](outputs/dlwp_combined_acc.png)
+
+### Spatial map of 2m air temperature
+
+
+
 ## Citation 
 
 ## References
